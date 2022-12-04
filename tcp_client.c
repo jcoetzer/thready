@@ -12,8 +12,8 @@
 
 int get_client(int port)
 {
-    int sockfd, connfd;
-    struct sockaddr_in servaddr, cli;
+    int sockfd;
+    struct sockaddr_in servaddr;
 
     printf("Connect client on port %d\n", port);
 
@@ -80,12 +80,12 @@ void send_client(int sockfd, char * msg, int echo)
     char buff[MAX+1];
 
     strncpy(buff, msg, MAX);
-    printf("To Server : %s", buff);
+    printf("To Server : %s\n", buff);
     write(sockfd, buff, sizeof(buff));
     if (echo)
     {
         bzero(buff, sizeof(buff));
         read(sockfd, buff, sizeof(buff));
-        printf("From Server : %s", buff);
+        printf("From Server : %s\n", buff);
     }
 }

@@ -3,12 +3,15 @@
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <libgen.h>
 
+#include "thready_data.h"
 #include "tcp_server.h"
+#include "tcp_client.h"
 
 void usage(char * pname);
 
@@ -62,11 +65,12 @@ int get_server(int port)
     return sockfd;
 }
 
-// Function for chat between client and server.
+// Chat between client and server.
 void run_server(int sockfd, int echo)
 {
     char buff[MAX];
-    int n, connfd, len;
+    int n, connfd;
+    socklen_t len;
     struct sockaddr_in cli;
 
     len = sizeof(cli);

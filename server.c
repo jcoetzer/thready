@@ -10,6 +10,8 @@
 
 #include "tcp_server.h"
 
+void usage(char * pname);
+
 // Entry point
 int main(int argc, char ** argv)
 {
@@ -50,7 +52,7 @@ int main(int argc, char ** argv)
 	// chat between client and server
 	run_server(sockfd, echo);
 
-	// After chatting close the socket
+	// close socket
 	close(sockfd);
 
     return 0;
