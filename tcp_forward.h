@@ -1,9 +1,9 @@
 #ifndef TCP_FORWARD_H
 #define TCP_FORWARD_H
 
-#define on_error(...) { fprintf(stderr, __VA_ARGS__); fflush(stderr); exit(1); }
-
-void logger(char * buf, int len);
+// #define on_error(...) { fprintf(stderr, __VA_ARGS__); fflush(stderr); exit(EXIT_FAILURE); }
+//
+// void log_data(char * buf, int len);
 
 /**
  * Send the traffic from src socket to dst socket
@@ -24,7 +24,8 @@ int open_forwarding_socket(char *forward_name, int forward_port);
  * Forwards all traffic from the client's socket to the destination
  * host/port.  This also initiates the connection to the destination.
  */
-void forward_traffic(int client_socket, char *forward_name, int forward_port);
+void forward_traffic(int client_socket, char *forward_name, int forward_port,
+                     int server_port);
 
 
 /**

@@ -8,13 +8,19 @@ handles numbers from 0 to 9999 */
 void convert_to_words(char* num);
 
 /* Driver program to test above function */
-int main(void)
+int main(int argc, char ** argv)
 {
     int i, start, end;
     char numstr[8];
 
     start = 1;
     end = 2499;
+
+    if (argc == 3)
+    {
+        start = atoi(argv[1]);
+        end = atoi(argv[2]);
+    }
 
     for (i=start; i<=end; i++)
     {

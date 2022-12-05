@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <string.h>
+#include <strings.h>
 #include <stdlib.h>
 #include <netdb.h>
 #include <signal.h>
@@ -15,28 +16,36 @@
 
 #include "thready_logger.h"
 
+extern int verbose;
+
 /**
  * Send the traffic from src socket to dst socket
  *
  * When done or on any error, this dies and will kill the forked process.
  */
 void comms(int src,
-         int dst)
+           int dst,
+           int server_port)
 {
     char buf[1024 * 4];
+    char pfix[32];
     int r, i, j;
+
+    sprintf(pfix, "RX%d", server_port);
 
     r = read(src, buf, 1024 * 4);
     while (r > 0)
     {
-        logger(buf, r);
+        log_warning("Received %d bytes on port %d\n", r, server_port);
+        log_data(pfix, buf, r);
         i = 0;
         while (i < r)
         {
+            log_data("TX", buf + i, r - 1);
             j = write(dst, buf + i, r - i);
             if (j == -1)
             {
-                // TODO check for errno EPIPE
+                // TODO check for error EPIPE
                 on_error("write failed: %s", strerror(errno));
             }
             i += j;
@@ -77,6 +86,7 @@ int open_forwarding_socket(char *forward_name,
 
     bzero((char *) &forward_address, sizeof(forward_address));
     forward_address.sin_family = AF_INET;
+    // TODO No member h_addr in struct hostent
     bcopy((char *)forward->h_addr,
           (char *) &forward_address.sin_addr.s_addr,
           forward->h_length);
@@ -108,7 +118,8 @@ int open_forwarding_socket(char *forward_name,
  */
 void forward_traffic(int client_socket,
                      char *forward_name,
-                     int forward_port)
+                     int forward_port,
+                     int server_port)
 {
     int forward_socket;
     pid_t down_pid;
@@ -125,12 +136,13 @@ void forward_traffic(int client_socket,
 
     if (down_pid == 0)
     {
-        comms(forward_socket, client_socket);
+        comms(forward_socket, client_socket, server_port);
     }
     else
     {
-        comms(client_socket, forward_socket);
+        comms(client_socket, forward_socket, server_port);
     }
+    sleep(1);
 }
 
 
@@ -141,6 +153,8 @@ int open_listening_port(int server_port)
 {
     struct sockaddr_in server_address;
     int server_socket;
+
+    log_info("Open port %d\n", server_port);
 
     server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket == -1)
@@ -175,7 +189,8 @@ int open_listening_port(int server_port)
  */
 void accept_connection(int server_socket,
                        char *forward_name,
-                       int forward_port)
+                       int forward_port,
+                       int server_port)
 {
     int client_socket;
     pid_t up_pid;
@@ -195,15 +210,15 @@ void accept_connection(int server_socket,
 
     if (up_pid == 0)
     {
-        forward_traffic(client_socket, forward_name, forward_port);
-        exit(1);
+        forward_traffic(client_socket, forward_name, forward_port, server_port);
+        exit(EXIT_FAILURE);
     }
 
     close(client_socket);
 }
 
 /**
- * Coordinates the effort
+ * Coordinate everything
  */
 void run_forward_server(int server_port,
                         int forward_port,
@@ -215,8 +230,8 @@ void run_forward_server(int server_port,
 
     while (1)
     {
-        accept_connection(server_socket, forward_name, forward_port);
-        sleep(1);
+        accept_connection(server_socket, forward_name, forward_port, server_port);
+        // sleep(1);
     }
 
     return;

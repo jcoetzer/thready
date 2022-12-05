@@ -22,7 +22,7 @@ int get_client(int port)
     if (sockfd == -1)
     {
         printf("Socket creation failed\n");
-        exit(0);
+        exit(EXIT_FAILURE);
     }
     else
     {
@@ -39,7 +39,7 @@ int get_client(int port)
     if (connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) != 0)
     {
         printf("Connection to server failed\n");
-        exit(0);
+        exit(EXIT_FAILURE);
     }
     else
     {

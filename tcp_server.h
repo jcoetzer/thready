@@ -1,5 +1,5 @@
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef TCP_SERVER_H
+#define TCP_SERVER_H
 
 #define MAX 80
 #define PORT 8080

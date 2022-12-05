@@ -62,5 +62,5 @@ void usage(char * pname)
 {
     printf("Usage:\n");
     printf("\t%s [-e] [PORT]\n", pname);
-    exit(1);
+    exit(EXIT_FAILURE);
 }

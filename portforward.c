@@ -36,7 +36,7 @@ void usage(char * pname)
 {
     fprintf(stderr, "Syntax:  %s listen_port forward_host [forward_port]\n",
             pname);
-    exit(1);
+    exit(EXIT_FAILURE);
 }
 
 /**
@@ -58,7 +58,7 @@ void parse_arguments(int argc,
     if (*server_port < 1)
     {
         fprintf(stderr, "Listen port is invalid\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     *forward_name = argv[2];
@@ -67,6 +67,6 @@ void parse_arguments(int argc,
     if (*forward_port < 1)
     {
         fprintf(stderr, "Forwarding port is invalid\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 }

@@ -6,14 +6,14 @@
 #include <unistd.h>
 
 #include "thready_data.h"
+#include "thready_logger.h"
 
-#include "tcp_client.h"
 #include "tcp_forward.h"
 
 #define MAX_THREADS 8
 
 void usage(char *pname);
-int run_thready(int pnum, int tcount, char * msg);
+int run_thready(int pnum, int tcount);
 void* forward_port_thread(void * pnums);
 
 int verbose = 0;
@@ -21,25 +21,24 @@ int verbose = 0;
 int main(int argc, char *argv[])
 {
     int rc, pnum, tcount;
-    char message[128];
 
     pnum = tcount = 0;
-    message[0] = 0;
 
-    if (argc == 5)
+    if (argc == 4)
     {
-        if (strcmp(argv[1], "-v"))
+        if (0 == strcmp(argv[1], "-vvv"))
         {
-            usage(basename(argv[0]));
+            verbose = 3;
+            pnum = atoi(argv[2]);
+            tcount = atoi(argv[3]);
         }
-        verbose = 1;
-        pnum = atoi(argv[2]);
-        tcount = atoi(argv[3]);
-        strcpy(message, argv[4]);
-    }
-    else if (argc == 4)
-    {
-        if (0 == strcmp(argv[1], "-v"))
+        else if (0 == strcmp(argv[1], "-vv"))
+        {
+            verbose = 2;
+            pnum = atoi(argv[2]);
+            tcount = atoi(argv[3]);
+        }
+        else if (0 == strcmp(argv[1], "-v"))
         {
             verbose = 1;
             pnum = atoi(argv[2]);
@@ -47,9 +46,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            pnum = atoi(argv[1]);
-            tcount = atoi(argv[2]);
-            strcpy(message, argv[3]);
+            usage(basename(argv[0]));
         }
     }
     else if (argc == 3)
@@ -61,24 +58,24 @@ int main(int argc, char *argv[])
     {
         usage(basename(argv[0]));
     }
-    rc = run_thready(pnum, tcount, message);
+    log_warning("Open %d ports starting with %d (%d)\n", tcount, pnum, verbose);
+    rc = run_thready(pnum, tcount);
     return rc;
 }
 
 void usage(char *pname)
 {
     printf("Run circle of servers:\n");
-    printf("\t%s [-v] <PORT> <COUNT>\n", pname);
-    printf("\t%s [-v] <PORT> <COUNT> <MESSAGE>\n", pname);
-    exit(1);
+    printf("\t%s [-v|-vv|-vvv] <PORT> <COUNT>\n", pname);
+    exit(EXIT_FAILURE);
 }
 
-int run_thready(int pnum, int tcount, char * msg)
+int run_thready(int pnum, int tcount)
 {
     pthread_t thrd[MAX_THREADS];
     struct thread_ports port_nums[MAX_THREADS];
     int thready[MAX_THREADS];
-    int i, sockfd;
+    int i;
 
     if (0 == pnum)
     {
@@ -86,11 +83,10 @@ int run_thready(int pnum, int tcount, char * msg)
         return 1;
     }
 
-    printf("Forward ports %d to %d\n", pnum, pnum+tcount-1);
+    log_warning("Forward ports %d to %d\n", pnum, pnum+tcount-1);
 
     for (i=0; i<tcount; i++)
     {
-        // listen_port(pnum+i);
         port_nums[i].rx_port = pnum + i;
         if (tcount == i+1)
         {
@@ -111,15 +107,6 @@ int run_thready(int pnum, int tcount, char * msg)
         pthread_join( thrd[i], NULL);
     }
 
-    if (msg[0])
-    {
-        // do the chat
-        sockfd = get_client(pnum);
-        send_client(sockfd, msg, 0);
-        // close socket
-        close(sockfd);
-    }
-
     return 0;
 }
 
@@ -133,6 +120,7 @@ void* forward_port_thread(void * pnums)
     rx_port = port_nums->rx_port;
     tx_port = port_nums->tx_port;
 
+    log_warning("Start thread to listen on %d and forward on %d\n", rx_port, tx_port);
+
     run_forward_server(rx_port, tx_port, server_name);
 }
-

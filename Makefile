@@ -1,12 +1,12 @@
 CC=gcc
-CFLAGS=-I.
+CFLAGS=-I. -g
 
 all: thready server client portforward numbers
 
 numbers: numbers.c
 	gcc -g numbers.c -o numbers
 
-THRY_OBJS = tcp_forward.o thready.o thready_logger.o tcp_client.o
+THRY_OBJS = tcp_forward.o thready.o thready_logger.o
 
 SRVR_OBJS = tcp_server.o server.o
 
@@ -28,6 +28,9 @@ client: $(CLNT_OBJS)
 
 portforward: $(FORW_OBJS)
 	$(CC) -o $@ $^ $(CFLAGS)
+
+check:
+	@ls -1 *.c | xargs -n1 -t splint
 
 clean:
 	rm -f $(THRY_OBJS) $(SRVR_OBJS) $(CLNT_OBJS) $(FORW_OBJS)

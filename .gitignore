@@ -5,3 +5,4 @@ thready.kdev4
 *.o
 portforward
 numbers
+data

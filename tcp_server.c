@@ -27,7 +27,7 @@ int get_server(int port)
     if (sockfd == -1)
     {
         printf("Socket creation failed\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     else
     {
@@ -44,7 +44,7 @@ int get_server(int port)
     if ((bind(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr))) != 0)
     {
         printf("Socket bind failed\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     else
     {
@@ -55,7 +55,7 @@ int get_server(int port)
     if ((listen(sockfd, 5)) != 0)
     {
         printf("Listen failed\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     else
     {
@@ -83,7 +83,7 @@ void run_server(int sockfd, int echo)
         if (connfd < 0)
         {
             printf("Server accept failed\n");
-            exit(1);
+            exit(EXIT_FAILURE);
         }
         /*
         else
