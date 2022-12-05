@@ -1,16 +1,18 @@
 CC=gcc
 CFLAGS=-I.
 
-all: thready server client portforward
+all: thready server client portforward numbers
 
-#thready: thready.c
-#	gcc thready.c -o thready
+numbers: numbers.c
+	gcc -g numbers.c -o numbers
 
-THRY_OBJS = tcp_server.o tcp_client.o thready.o thready_server.o
+THRY_OBJS = tcp_forward.o thready.o thready_logger.o tcp_client.o
 
 SRVR_OBJS = tcp_server.o server.o
 
 CLNT_OBJS = tcp_client.o client.o
+
+FORW_OBJS = tcp_forward.o portforward.o thready_logger.o
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -24,9 +26,9 @@ server: $(SRVR_OBJS)
 client: $(CLNT_OBJS)
 	$(CC) -o $@ $^ $(CFLAGS)
 
-portforward: portforward.c
-	gcc portforward.c -o portforward
+portforward: $(FORW_OBJS)
+	$(CC) -o $@ $^ $(CFLAGS)
 
 clean:
-	rm -f $(THRY_OBJS) $(SRVR_OBJS) $(CLNT_OBJS) $(STUF_OBJS)
-	rm -f thready server client portforward
+	rm -f $(THRY_OBJS) $(SRVR_OBJS) $(CLNT_OBJS) $(FORW_OBJS)
+	rm -f thready server client portforward numbers
