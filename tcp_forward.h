@@ -1,10 +1,6 @@
 #ifndef TCP_FORWARD_H
 #define TCP_FORWARD_H
 
-// #define on_error(...) { fprintf(stderr, __VA_ARGS__); fflush(stderr); exit(EXIT_FAILURE); }
-//
-// void log_data(char * buf, int len);
-
 /**
  * Send the traffic from src socket to dst socket
  *

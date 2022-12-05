@@ -11,7 +11,7 @@
 #define log_info printf
 #define log_debug printf
 
-#define on_error(...) { fprintf(stderr, __VA_ARGS__); fflush(stderr); exit(EXIT_FAILURE); }
+#define log_error(...) { fprintf(stderr, __VA_ARGS__); fflush(stderr); exit(EXIT_FAILURE); }
 
 void log_data(char * pfix, char * buf, int len);
 

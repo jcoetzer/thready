@@ -46,7 +46,7 @@ void comms(int src,
             if (j == -1)
             {
                 // TODO check for error EPIPE
-                on_error("write failed: %s", strerror(errno));
+                log_error("write failed: %s\n", strerror(errno));
             }
             i += j;
         }
@@ -55,7 +55,7 @@ void comms(int src,
 
     if (r == -1)
     {
-        on_error("read failed: %s", strerror(errno));
+        log_error("read failed: %s\n", strerror(errno));
     }
 
     shutdown(src, SHUT_RD);
@@ -81,7 +81,7 @@ int open_forwarding_socket(char *forward_name,
     forward = gethostbyname(forward_name);
     if (forward == NULL)
     {
-        on_error("gethostbyname failed: %s", strerror(errno));
+        log_error("gethostbyname failed: %s\n", strerror(errno));
     }
 
     bzero((char *) &forward_address, sizeof(forward_address));
@@ -97,7 +97,7 @@ int open_forwarding_socket(char *forward_name,
 
     if (forward_socket == -1)
     {
-        on_error("Could not create socket with port %d: %s",
+        log_error("Could not create socket with port %d: %s\n",
                  forward_port, strerror(errno));
     }
 
@@ -105,7 +105,7 @@ int open_forwarding_socket(char *forward_name,
                 (struct sockaddr *) &forward_address,
                 sizeof(forward_address)) == -1)
     {
-        on_error("connect failed: %s", strerror(errno));
+        log_error("connect failed: %s\n", strerror(errno));
     }
 
     return forward_socket;
@@ -131,7 +131,7 @@ void forward_traffic(int client_socket,
     down_pid = fork();
     if (down_pid == -1)
     {
-        on_error("fork failed: %s", strerror(errno));
+        log_error("fork failed: %s\n", strerror(errno));
     }
 
     if (down_pid == 0)
@@ -159,7 +159,7 @@ int open_listening_port(int server_port)
     server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket == -1)
     {
-        on_error("socket failed: %s", strerror(errno));
+        log_error("socket failed: %s\n", strerror(errno));
     }
 
     bzero((char *) &server_address, sizeof(server_address));
@@ -171,12 +171,12 @@ int open_listening_port(int server_port)
              (struct sockaddr *) &server_address,
              sizeof(server_address)) == -1)
     {
-        on_error("bind failed: %s", strerror(errno));
+        log_error("bind failed: %s\n", strerror(errno));
     }
 
     if (listen(server_socket, 40) == -1)
     {
-        on_error("listen failed: %s", strerror(errno));
+        log_error("listen failed: %s\n", strerror(errno));
     }
 
     return server_socket;
@@ -198,14 +198,14 @@ void accept_connection(int server_socket,
     client_socket = accept(server_socket, NULL, NULL);
     if (client_socket == -1)
     {
-        on_error("accept failed: %s", strerror(errno));
+        log_error("accept failed: %s\n", strerror(errno));
     }
 
     // Fork - Child handles this connection, parent listens for another
     up_pid = fork();
     if (up_pid == -1)
     {
-        on_error("fork failed: %s", strerror(errno));
+        log_error("fork failed: %s\n", strerror(errno));
     }
 
     if (up_pid == 0)
