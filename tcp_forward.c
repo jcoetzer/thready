@@ -142,7 +142,7 @@ void forward_traffic(int client_socket,
     {
         comms(client_socket, forward_socket, server_port);
     }
-    sleep(1);
+    // sleep(1);
 }
 
 
@@ -231,7 +231,7 @@ void run_forward_server(int server_port,
     while (1)
     {
         accept_connection(server_socket, forward_name, forward_port, server_port);
-        // sleep(1);
+        sleep(1);
     }
 
     return;
